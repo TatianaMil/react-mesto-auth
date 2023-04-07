@@ -10,6 +10,12 @@ import AddPlacePopup from "./AddPlacePopup";
 import PopupDeleteCard from './PopupDeleteCard';
 import ImagePopup from "./ImagePopup";
 import api from "../utils/Api";
+import Login from './Login';
+import { Route, Switch, Redirect, useHistory } from 'react-router-dom';
+import ProtectedRoute from './ProtectedRoute';
+import Register from './Register';
+import * as auth from '../utils/auth';
+import InfoToolTip from './InfoToolTip';
 
 function App() {
   const [deletedCard, setDeletedCard] = useState({});
@@ -21,7 +27,37 @@ function App() {
   const [currentUser, setCurrentUser] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [cards, setCards] = useState([]);
+
+
+  const [isLoggedIn, setIsLoggedIn] =useState(false);
+  const [email, setEmail] = useState('');
+  const history = useHistory();
+  const [isInfoToolTipPopupOpen, setInfoToolTipPopupOpen] =
+    useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
+
+  useEffect(() => {
+    const jwt = localStorage.getItem('jwt');
+
+    if (jwt) {
+      auth
+        .checkToken(jwt)
+        .then(res => {
+          setIsLoggedIn(true);
+          setEmail(res.data.email);
+          history.push('/');
+        })
+        .catch(err => {
+          if (err.status === 401) {
+            console.log('401 — Токен не передан или передан не в том формате');
+          }
+          console.log('401 — Переданный токен некорректен');
+        });
+    }
+  }, [history]);
 
   useEffect(() => {
     api
@@ -52,6 +88,8 @@ function App() {
     setIsPopupDeleteCardOpen(false)
     setDeletedCard({})
     setSelectedCard({})
+
+    setInfoToolTipPopupOpen(false);
   }
 
   function closeByOverlay(evt) {
@@ -150,12 +188,95 @@ function App() {
       .finally(() => setIsLoading(false))
   }
 
+  function handleRegisterSubmit(email, password) {
+    auth
+      .register(email, password)
+      .then(res => {
+        setInfoToolTipPopupOpen(true);
+        setIsSuccess(true);
+        history.push('/sign-in');
+      })
+      .catch(err => {
+        if (err.status === 400) {
+          console.log('400 - некорректно заполнено одно из полей');
+        }
+        setInfoToolTipPopupOpen(true);
+        setIsSuccess(false);
+      });
+  }
+
+  function handleLoginSubmit(email, password) {
+    auth
+      .login(email, password)
+      .then(res => {
+        localStorage.setItem('jwt', res.token);
+        setIsLoggedIn(true);
+        setEmail(email);
+        history.push('/');
+      })
+      .catch(err => {
+        if (err.status === 400) {
+          console.log('400 - не передано одно из полей');
+        } else if (err.status === 401) {
+          console.log('401 - пользователь с email не найден');
+        }
+      });
+  }
+
+  function handleSignOut() {
+    localStorage.removeItem('jwt');
+    setIsLoggedIn(false);
+    setIsMobileMenuOpen(false);
+    history.push('/sign-in');
+    setIsMobileMenuOpen(false);
+  }
+
+  function handleClickOpenMobileMenu() {
+    if (isLoggedIn) {
+      setIsMobileMenuOpen(!isMobileMenuOpen);
+    }
+  }
+
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div className="page">
         <div className="page__container">
-          <Header />
-          <Main
+          <Header  
+           email={email}
+           onSignOut={handleSignOut}
+           isMobileMenuOpen={isMobileMenuOpen}
+           handleClickOpenMobileMenu={handleClickOpenMobileMenu}
+           isLoggedIn={isLoggedIn}
+          />
+
+
+          <Switch>
+            <ProtectedRoute
+              exact
+              path="/"
+              isLoggedIn={isLoggedIn}
+            /*  onEditAvatar={handleEditAvatarClick}
+              onEditProfile={handleEditProfileClick}
+              onAddPlace={handleAddPlaceClick}
+              onCardClick={handleCardClick}
+              onCardLike={handleCardLike}
+              onCardDelete={handleCardDelete}
+              cards={cards}
+              component={Main}*/
+              isLoading={isLoading}
+            />
+            <Route path="/sign-in">
+              <Login onLogin={handleLoginSubmit} />
+            </Route>
+            <Route path="/sign-up">
+              <Register onRegister={handleRegisterSubmit} />
+            </Route>
+            <Route>
+              {isLoggedIn ? <Redirect to="/" /> : <Redirect to="/sign-in" />}
+            </Route>
+          </Switch>
+
+         <Main
             onEditProfile={setIsEditProfilePopupOpen}
             onEditAvatar={setIsEditAvatarPopupOpen}
             onAddPlace={setIsAddPlacePopupOpen}
