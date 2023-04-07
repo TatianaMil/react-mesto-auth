@@ -11,6 +11,4 @@
 
 Ссылка на GitHub Pages: 
 
-- [Проект mesto-react](https://tatianamil.github.io/mesto-react-auth/)
-
-
+- [Проект mesto-react-auth](https://tatianamil.github.io/mesto-react-auth/)

@@ -30,7 +30,7 @@ function EditAvatarPopup({onLoading, onClose, onUpdateAvatar, isOpen, onCloseOve
         onClose={onClose}
         isOpen={isOpen}
         onCloseOverlay={onCloseOverlay} 
-      >
+        >
 
         <input 
         type="url" 
@@ -41,7 +41,7 @@ function EditAvatarPopup({onLoading, onClose, onUpdateAvatar, isOpen, onCloseOve
         ref={avatarRef}
         placeholder="Введите ссылку URL"
         required
-         />
+        />
         <span className="avatarLink-error popup__input-error" />
 
       </PopupWithForm>
