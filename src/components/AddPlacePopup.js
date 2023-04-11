@@ -61,7 +61,6 @@ function AddPlacePopup({onClose, onAddPlace, onLoading, isOpen, onCloseOverlay})
           onChange={handleChangePlaceLink} />
           <span className="link-error popup__input-error" />
 
-
         </PopupWithForm>
     )
 }

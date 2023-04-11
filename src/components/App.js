@@ -17,6 +17,7 @@ import Register from './Register';
 import * as auth from '../utils/auth';
 import InfoToolTip from './InfoToolTip';
 
+
 function App() {
   const [deletedCard, setDeletedCard] = useState({});
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
@@ -28,12 +29,10 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [cards, setCards] = useState([]);
 
-
   const [isLoggedIn, setIsLoggedIn] =useState(false);
   const [email, setEmail] = useState('');
   const history = useHistory();
-  const [isInfoToolTipPopupOpen, setInfoToolTipPopupOpen] =
-    useState(false);
+  const [isInfoToolTipPopupOpen, setInfoToolTipPopupOpen] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -60,6 +59,7 @@ function App() {
   }, [history]);
 
   useEffect(() => {
+    setIsLoading(true)
     api
       .getRealUserInfo()
       .then((profileInfo) => setCurrentUser(profileInfo))
@@ -79,6 +79,7 @@ function App() {
         )
       })
       .catch((error) => console.log(`Ошибка: ${error}`))
+      .finally(() => setIsLoading(false))
   }, [])
 
   function closeAllPopups() {
@@ -249,22 +250,23 @@ function App() {
            isLoggedIn={isLoggedIn}
           />
 
-
           <Switch>
             <ProtectedRoute
               exact
               path="/"
               isLoggedIn={isLoggedIn}
-            /*  onEditAvatar={handleEditAvatarClick}
-              onEditProfile={handleEditProfileClick}
-              onAddPlace={handleAddPlaceClick}
-              onCardClick={handleCardClick}
+              onEditAvatar={setIsEditAvatarPopupOpen}
+              onEditProfile={setIsEditProfilePopupOpen}
+              onPopupDeleteCard={setIsPopupDeleteCardOpen}
+              onAddPlace={setIsAddPlacePopupOpen}
+              onCardClick={setSelectedCard}
               onCardLike={handleCardLike}
-              onCardDelete={handleCardDelete}
+              onDeletedCard={setDeletedCard}
               cards={cards}
-              component={Main}*/
+              component={Main}
               isLoading={isLoading}
             />
+
             <Route path="/sign-in">
               <Login onLogin={handleLoginSubmit} />
             </Route>
@@ -276,17 +278,8 @@ function App() {
             </Route>
           </Switch>
 
-         <Main
-            onEditProfile={setIsEditProfilePopupOpen}
-            onEditAvatar={setIsEditAvatarPopupOpen}
-            onAddPlace={setIsAddPlacePopupOpen}
-            onPopupDeleteCard={setIsPopupDeleteCardOpen}
-            onDeletedCard={setDeletedCard}
-            onCardClick={setSelectedCard}
-            onCardLike={handleCardLike}
-            cards={cards}
-          />
-          <Footer />
+          {isLoggedIn && <Footer />}
+
           <AddPlacePopup
             onAddPlace={handleAddPlaceSubmit}
             isOpen={isAddPlacePopupOpen}
@@ -320,6 +313,11 @@ function App() {
             card={selectedCard} 
             onClose={closeAllPopups}
             onCloseOverlay={closeByOverlay} 
+          />
+          <InfoToolTip
+            isOpen={isInfoToolTipPopupOpen}
+            onClose={closeAllPopups}
+            isSuccess={isSuccess}
           />
         </div>
       </div>
