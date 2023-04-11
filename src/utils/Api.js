@@ -11,7 +11,7 @@ class Api {
       return Promise.resolve(res.json());
     }
 
-    //reject promise
+  //reject promise
     return Promise.reject(`Ошибка: ${res.status}`);
   }
 
@@ -72,7 +72,7 @@ class Api {
     return this._handleResponse(response);
   }
 
-  //remove like for  the cards
+  //remove like for the cards
   async removeLike(cardId) {
     const response = await fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
       method: "DELETE",
