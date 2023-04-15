@@ -1,23 +1,37 @@
 import React from "react";
 
 //everyone form without img
-function PopupWithForm({ name, title, buttonText, children, isOpen, onSubmit, onClose, onCloseOverlay }) {
+function PopupWithForm(props) {
   return (
-    <div className={`popup popup_type_${name} ${isOpen ? "popup_opened" : ""}`}
-    onClick={onCloseOverlay}
+    <div
+      className={`popup popup_type_${props.name} ${
+        props.isOpen ? "popup_opened" : ""
+      }`}
+      onClick={props.onCloseOverlay}
     >
       <div className="popup__container">
-        <button className="popup__button-close" type="button" onClick={onClose} />
-        <h2 className="popup__title">{title}</h2>
-          {children}
-        <form className="popup__form" name={name} onSubmit={onSubmit}>
-          <button className="popup__button-submit popup__button-submit_delete-card" type="submit">
-            {buttonText || "Сохранить"}
+        <button
+          className="popup__button-close"
+          type="button"
+          onClick={props.onClose}
+        />
+        <h2 className="popup__title">{props.title}</h2>
+        {props.children}
+        <form
+          className="popup__form"
+          name={props.name}
+          onSubmit={props.onSubmit}
+        >
+          <button
+            className="popup__button-submit popup__button-submit_delete-card"
+            type="submit"
+          >
+            {props.buttonText || "Сохранить"}
           </button>
         </form>
       </div>
     </div>
-  )
+  );
 }
 
-export default PopupWithForm
+export default PopupWithForm;

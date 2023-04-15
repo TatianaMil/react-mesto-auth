@@ -8,6 +8,7 @@
     "@testing-library/user-event": "^13.5.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-router-dom": "^6.10.0",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },
@@ -40,5 +41,16 @@
   },
   "devDependencies": {
     "gh-pages": "^5.0.0"
+  },
+  "description": "Место - это интерактивная страница, на которой пользователи могут делиться фотографиями, удалять их и ставить лайки.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TatianaMil/react-mesto-auth.git"
+  },
+  "author": "Tatiana",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TatianaMil/react-mesto-auth/issues"
   }
 }

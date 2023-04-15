@@ -1,33 +1,123 @@
-import React from 'react';
-import Header from './Header';
-import Footer from './Footer';
-import Main from './Main';
-import CurrentUserContext from '../contexts/CurrentUserContext';
-import { useState, useEffect } from 'react';
+import React from "react";
+import { useState, useEffect, useCallback } from "react";
+import { Route, Routes, Navigate, useNavigate } from "react-router-dom";
+
+// import Header from "./Header";
+// import Main from "./Main";
+import Footer from "./Footer";
+
+import CurrentUserContext from "../contexts/CurrentUserContext";
+
 import EditProfilePopup from "./EditProfilePopup";
 import EditAvatarPopup from "./EditAvatarPopup";
 import AddPlacePopup from "./AddPlacePopup";
-import PopupDeleteCard from './PopupDeleteCard';
+import PopupDeleteCard from "./PopupDeleteCard";
 import ImagePopup from "./ImagePopup";
 import api from "../utils/Api";
+import ProtectedRoute from "./ProtectedRoute";
+import InfoTooltip from "./InfoTooltip";
+import auth from "../utils/auth";
+import Login from "./Login";
+import Register from "./Register";
 
 function App() {
-  const [deletedCard, setDeletedCard] = useState({});
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
   const [isPopupDeleteCardOpen, setIsPopupDeleteCardOpen] = useState(false);
+  const [deletedCard, setDeletedCard] = useState({});
   const [selectedCard, setSelectedCard] = useState({});
   const [currentUser, setCurrentUser] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
   const [cards, setCards] = useState([]);
-  
+  const [isLoading, setIsLoading] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [isInfoTooltipOpen, setIsInfoTooltipOpen] = useState(false);
+  const [isInfoTooltipMessage, setIsInfoTooltipMessage] = useState("");
+  const [isRegistrationSuccess, setIsRegistrationSuccess] = useState(false);
+  const [email, setEmail] = useState("");
+  const navigate = useNavigate();
+  console.log("test");
 
+  const tokenCheck = useCallback(() => {
+    const token = localStorage.getItem("token");
+    if (token && !loggedIn) {
+      auth
+        .checkToken(token)
+        .then((res) => {
+          if (res) {
+            setLoggedIn(true);
+            navigate("/react-mesto-auth", { replace: true });
+            setEmail(res.data.email);
+          }
+        })
+        .catch((err) => console.log(err));
+    }
+  }, [loggedIn, navigate]);
+
+  useEffect(() => {
+    tokenCheck();
+    if (loggedIn) {
+      Promise.all([api.getUserInfo(), api.getInitialCards()])
+        .then(([userRes, cardsRes]) => {
+          setCurrentUser(userRes);
+          setCards(cardsRes);
+        })
+        .catch((err) => console.log(err));
+    }
+  }, [loggedIn, tokenCheck]);
+
+  //авторизация пользователя на странице
+  function handleLogin(userData) {
+    auth
+      .login(userData)
+      .then((res) => {
+        if (res.token) {
+          localStorage.setItem("token", res.token);
+          setLoggedIn(true);
+          setEmail(userData.email);
+          navigate("/", { replace: true });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setIsRegistrationSuccess(false);
+        handleSignup("Что-то пошло не так! Попробуйте еще раз.");
+      });
+  }
+
+  //register users
+  function handleRegister(regUserData) {
+    auth
+      .register(regUserData)
+      .then(() => {
+        navigate("/sign-in", { replace: true });
+        setIsRegistrationSuccess(true);
+        handleSignup("Вы успешно зарегистрировались!");
+      })
+      .catch((err) => {
+        console.log(err);
+        setIsRegistrationSuccess(false);
+        handleSignup("Что-то пошло не так! Попробуйте еще раз.");
+      });
+  }
+
+  function handleSignup(message) {
+    setIsInfoTooltipMessage(message);
+    setIsInfoTooltipOpen(true);
+  }
+
+  function handleSignout() {
+    setLoggedIn(false);
+    localStorage.removeItem("token");
+    navigate("/sign-in", { replace: true });
+  }
+
+  //profile info
   useEffect(() => {
     api
       .getRealUserInfo()
       .then((profileInfo) => setCurrentUser(profileInfo))
-      .catch((error) => console.log(`Ошибка: ${error}`))
+      .catch((error) => console.log(`Ошибка: ${error}`));
 
     api
       .getInitialCards()
@@ -40,82 +130,88 @@ function App() {
             likes: card.likes,
             owner: card.owner,
           }))
-        )
+        );
       })
-      .catch((error) => console.log(`Ошибка: ${error}`))
-  }, [])
+      .catch((error) => console.log(`Ошибка: ${error}`));
+  }, []);
 
   function closeAllPopups() {
-    setIsEditProfilePopupOpen(false)
-    setIsAddPlacePopupOpen(false)
-    setIsEditAvatarPopupOpen(false)
-    setIsPopupDeleteCardOpen(false)
-    setDeletedCard({})
-    setSelectedCard({})
+    setIsEditProfilePopupOpen(false);
+    setIsAddPlacePopupOpen(false);
+    setIsEditAvatarPopupOpen(false);
+    setIsPopupDeleteCardOpen(false);
+    setDeletedCard({});
+    setSelectedCard({});
   }
 
   function closeByOverlay(evt) {
     if (evt.target === evt.currentTarget) {
-      console.log('asd')
+      console.log("asd");
       closeAllPopups();
     }
   }
 
-    const isOpen = isEditAvatarPopupOpen || isEditProfilePopupOpen || isAddPlacePopupOpen || isPopupDeleteCardOpen || selectedCard.link
+  const isOpen =
+    isEditAvatarPopupOpen ||
+    isEditProfilePopupOpen ||
+    isAddPlacePopupOpen ||
+    isPopupDeleteCardOpen ||
+    selectedCard.link;
 
   useEffect(() => {
     function closeByEscape(evt) {
-      if(evt.key === 'Escape') {
+      if (evt.key === "Escape") {
         closeAllPopups();
       }
     }
-    if(isOpen) { // навешиваем только при открытии
-      document.addEventListener('keydown', closeByEscape);
+    if (isOpen) {
+      // навешиваем только при открытии
+      document.addEventListener("keydown", closeByEscape);
       return () => {
-        document.removeEventListener('keydown', closeByEscape);
-      }
+        document.removeEventListener("keydown", closeByEscape);
+      };
     }
-  }, [isOpen]) 
+  }, [isOpen]);
 
   function handleUpdateAvatar(newAvatar) {
-    setIsLoading(true)
+    setIsLoading(true);
     api
       .updateProfileUserAvatar(newAvatar)
       .then((data) => {
-        setCurrentUser(data)
-        closeAllPopups()
+        setCurrentUser(data);
+        closeAllPopups();
       })
       .catch((error) => console.log(`Ошибка: ${error}`))
-      .finally(() => setIsLoading(false))
+      .finally(() => setIsLoading(false));
   }
 
   function handleUpdateUser(newUserInfo) {
-    setIsLoading(true)
+    setIsLoading(true);
     api
       .editProfileUserApi(newUserInfo)
       .then((data) => {
-        setCurrentUser(data)
-        closeAllPopups()
+        setCurrentUser(data);
+        closeAllPopups();
       })
       .catch((error) => console.log(`Ошибка: ${error}`))
-      .finally(() => setIsLoading(false))
+      .finally(() => setIsLoading(false));
   }
 
   function handleAddPlaceSubmit(data) {
-    setIsLoading(true)
+    setIsLoading(true);
     api
       .createNewCardApi(data)
       .then((newCard) => {
-        setCards([newCard, ...cards])
-        closeAllPopups()
+        setCards([newCard, ...cards]);
+        closeAllPopups();
       })
       .catch((error) => console.log(`Ошибка: ${error}`))
-      .finally(() => setIsLoading(false))
+      .finally(() => setIsLoading(false));
   }
 
   function handleCardLike(card) {
-    const isLiked = card.likes.some((user) => user._id === currentUser._id)
-    console.log(isLiked)
+    const isLiked = card.likes.some((user) => user._id === currentUser._id);
+    console.log(isLiked);
     if (isLiked) {
       api
         .removeLike(card._id)
@@ -124,7 +220,7 @@ function App() {
             state.map((item) => (item._id === card._id ? newCard : item))
           )
         )
-        .catch((error) => console.log(`Ошибка: ${error}`))
+        .catch((error) => console.log(`Ошибка: ${error}`));
     } else {
       api
         .addLike(card._id)
@@ -133,38 +229,73 @@ function App() {
             state.map((item) => (item._id === card._id ? newCard : item))
           )
         )
-        .catch((error) => console.log(`Ошибка: ${error}`))
+        .catch((error) => console.log(`Ошибка: ${error}`));
     }
   }
 
   function handleCardDelete(card) {
-    setIsLoading(true)
+    setIsLoading(true);
     api
       .removeCard(card._id)
       .then(() => {
-        setCards((state) => state.filter((item) => item._id !== card._id))
-        closeAllPopups()
-      }
-      )
+        setCards((state) => state.filter((item) => item._id !== card._id));
+        closeAllPopups();
+      })
       .catch((error) => console.log(`Ошибка: ${error}`))
-      .finally(() => setIsLoading(false))
+      .finally(() => setIsLoading(false));
   }
 
   return (
-    <CurrentUserContext.Provider value={currentUser}>
-      <div className="page">
-        <div className="page__container">
-          <Header />
-          <Main
-            onEditProfile={setIsEditProfilePopupOpen}
-            onEditAvatar={setIsEditAvatarPopupOpen}
-            onAddPlace={setIsAddPlacePopupOpen}
-            onPopupDeleteCard={setIsPopupDeleteCardOpen}
-            onDeletedCard={setDeletedCard}
-            onCardClick={setSelectedCard}
-            onCardLike={handleCardLike}
-            cards={cards}
-          />
+    <div className="page">
+      <div className="page__container">
+        <CurrentUserContext.Provider value={currentUser}>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                loggedIn ? (
+                  <Navigate to="/react-mesto-auth" replace />
+                ) : (
+                  <Navigate to="/sign-up" replace />
+                )
+              }
+            />
+            <Route
+              path="/sign-in"
+              element={
+                <Login onLogin={handleLogin} title="Вход" buttonText="Войти" />
+              }
+            />
+            <Route
+              path="/sign-up"
+              element={
+                <Register
+                  onRegister={handleRegister}
+                  title="Регистрация"
+                  buttonText="Зарегистрироваться"
+                />
+              }
+            />
+            <Route
+              path="/react-mesto-auth"
+              element={
+                <ProtectedRoute
+                  onEditProfile={setIsEditProfilePopupOpen}
+                  onEditAvatar={setIsEditAvatarPopupOpen}
+                  onAddPlace={setIsAddPlacePopupOpen}
+                  onPopupDeleteCard={setIsPopupDeleteCardOpen}
+                  onCardClick={setSelectedCard}
+                  onCardLike={handleCardLike}
+                  onDeletedCard={setDeletedCard}
+                  cards={cards}
+                  loggedIn={loggedIn}
+                  email={email}
+                  onSignout={handleSignout}
+                />
+              }
+            />
+          </Routes>
+
           <Footer />
           <AddPlacePopup
             onAddPlace={handleAddPlaceSubmit}
@@ -195,15 +326,22 @@ function App() {
             card={deletedCard}
             onCloseOverlay={closeByOverlay}
           />
-          <ImagePopup 
-            card={selectedCard} 
+          <ImagePopup
+            card={selectedCard}
             onClose={closeAllPopups}
-            onCloseOverlay={closeByOverlay} 
+            onCloseOverlay={closeByOverlay}
           />
-        </div>
+          <InfoTooltip
+            isOpen={isInfoTooltipOpen}
+            message={isInfoTooltipMessage}
+            isSuccess={isRegistrationSuccess}
+            onClose={closeAllPopups}
+            onCloseOverlay={closeByOverlay}
+          />
+        </CurrentUserContext.Provider>
       </div>
-    </CurrentUserContext.Provider>
-  )
+    </div>
+  );
 }
 
 export default App;

@@ -11,7 +11,7 @@ class Api {
       return Promise.resolve(res.json());
     }
 
-  //reject promise
+    //reject promise
     return Promise.reject(`Ошибка: ${res.status}`);
   }
 
@@ -92,7 +92,7 @@ class Api {
     });
     return this._handleResponse(response);
   }
-};
+}
 
 //connect api
 const api = new Api({
@@ -103,4 +103,4 @@ const api = new Api({
   },
 });
 
-export default api
+export default api;

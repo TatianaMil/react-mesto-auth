@@ -1,0 +1,15 @@
+.auth-form__button {
+  width: 100%;
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: black;
+  text-align: center;
+  background-color: white;
+}
+
+@media screen and (max-width: 767px) {
+  .auth-form__button {
+    margin-bottom: 18px;
+    font-size: 16px;
+  }
+}
