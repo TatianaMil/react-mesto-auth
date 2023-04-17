@@ -6,11 +6,7 @@ function Header(props) {
   return (
     //add marking up header
     <header className="header">
-      <img
-        src={headerLogo}
-        alt="логотип"
-        className="header__logo"
-      />
+      <img src={headerLogo} alt="логотип" className="header__logo" />
       <div className="header__container">
         <span className="header__email">{props.email}</span>
         <Link

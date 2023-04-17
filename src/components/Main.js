@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import CurrentUserContext from "../contexts/CurrentUserContext";
 import profileEditAvatar from "../images/popup.svg";
 import Card from "./Card";
@@ -6,7 +6,7 @@ import Header from "./Header";
 
 // обработчики
 function Main(props) {
-  const currentUser = React.useContext(CurrentUserContext);
+  const currentUser = useContext(CurrentUserContext);
 
   return (
     <>
