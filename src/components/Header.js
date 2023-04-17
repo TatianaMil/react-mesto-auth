@@ -8,10 +8,10 @@ function Header(props) {
     <header className="header">
       <img
         src={headerLogo}
-        alt="логотип страницы место"
+        alt="логотип"
         className="header__logo"
       />
-      <div className="header__data">
+      <div className="header__container">
         <span className="header__email">{props.email}</span>
         <Link
           to={props.buttonLink}

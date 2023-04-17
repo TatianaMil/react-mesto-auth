@@ -1,9 +1,9 @@
-import React from "react";
-import { useState, useEffect, useCallback } from "react";
-import { Route, Routes, Navigate, useNavigate } from "react-router-dom";
+// import React from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 
 // import Header from "./Header";
-// import Main from "./Main";
+import Main from "./Main";
 import Footer from "./Footer";
 
 import CurrentUserContext from "../contexts/CurrentUserContext";
@@ -36,7 +36,6 @@ function App() {
   const [isRegistrationSuccess, setIsRegistrationSuccess] = useState(false);
   const [email, setEmail] = useState("");
   const navigate = useNavigate();
-  console.log("test");
 
   const tokenCheck = useCallback(() => {
     const token = localStorage.getItem("token");
@@ -57,7 +56,7 @@ function App() {
   useEffect(() => {
     tokenCheck();
     if (loggedIn) {
-      Promise.all([api.getUserInfo(), api.getInitialCards()])
+      Promise.all([api.getRealUserInfo(), api.getInitialCards()])
         .then(([userRes, cardsRes]) => {
           setCurrentUser(userRes);
           setCards(cardsRes);
@@ -112,28 +111,28 @@ function App() {
     navigate("/sign-in", { replace: true });
   }
 
-  //profile info
-  useEffect(() => {
-    api
-      .getRealUserInfo()
-      .then((profileInfo) => setCurrentUser(profileInfo))
-      .catch((error) => console.log(`Ошибка: ${error}`));
+  // profile info
+  // useEffect(() => {
+  //   api
+  //     .getRealUserInfo()
+  //     .then((profileInfo) => setCurrentUser(profileInfo))
+  //     .catch((error) => console.log(`Ошибка: ${error}`));
 
-    api
-      .getInitialCards()
-      .then((data) => {
-        setCards(
-          data.map((card) => ({
-            _id: card._id,
-            name: card.name,
-            link: card.link,
-            likes: card.likes,
-            owner: card.owner,
-          }))
-        );
-      })
-      .catch((error) => console.log(`Ошибка: ${error}`));
-  }, []);
+  //   api
+  //     .getInitialCards()
+  //     .then((data) => {
+  //       setCards(
+  //         data.map((card) => ({
+  //           _id: card._id,
+  //           name: card.name,
+  //           link: card.link,
+  //           likes: card.likes,
+  //           owner: card.owner,
+  //         }))
+  //       );
+  //     })
+  //     .catch((error) => console.log(`Ошибка: ${error}`));
+  // }, []);
 
   function closeAllPopups() {
     setIsEditProfilePopupOpen(false);
@@ -280,6 +279,7 @@ function App() {
               path="/react-mesto-auth"
               element={
                 <ProtectedRoute
+                  element={Main}
                   onEditProfile={setIsEditProfilePopupOpen}
                   onEditAvatar={setIsEditAvatarPopupOpen}
                   onAddPlace={setIsAddPlacePopupOpen}

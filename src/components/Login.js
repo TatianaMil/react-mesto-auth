@@ -29,28 +29,32 @@ const Login = (props) => {
         <h2 className="auth-form__title">{props.title}</h2>
         <form onSubmit={handleSubmit}>
           <div className="auth-form__inputs-all">
-            <input
-              className="auth-form__input"
-              name="email"
-              type="email"
-              placeholder="Email"
-              required
-              value={formValue.email || ""}
-              onChange={handleChange}
-              minLength="4"
-              maxLength="30"
-            />
-            <input
-              className="auth-form__input"
-              name="password"
-              type="password"
-              placeholder="Пароль"
-              required
-              value={formValue.password || ""}
-              onChange={handleChange}
-              minLength="4"
-              maxLength="30"
-            />
+            <label>
+              <input
+                className="auth-form__input"
+                name="email"
+                type="email"
+                placeholder="Email"
+                required
+                value={formValue.email || ""}
+                onChange={handleChange}
+                minLength="4"
+                maxLength="30"
+              />
+            </label>
+            <label>
+              <input
+                className="auth-form__input"
+                name="password"
+                type="password"
+                placeholder="Пароль"
+                required
+                value={formValue.password || ""}
+                onChange={handleChange}
+                minLength="4"
+                maxLength="30"
+              />
+            </label>
           </div>
           <button className={`auth-form__button button`} type="submit">
             {props.buttonText}
