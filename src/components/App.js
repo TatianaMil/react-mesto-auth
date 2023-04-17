@@ -112,27 +112,27 @@ function App() {
   }
 
   // profile info
-  // useEffect(() => {
-  //   api
-  //     .getRealUserInfo()
-  //     .then((profileInfo) => setCurrentUser(profileInfo))
-  //     .catch((error) => console.log(`Ошибка: ${error}`));
+  useEffect(() => {
+    api
+      .getRealUserInfo()
+      .then((profileInfo) => setCurrentUser(profileInfo))
+      .catch((error) => console.log(`Ошибка: ${error}`));
 
-  //   api
-  //     .getInitialCards()
-  //     .then((data) => {
-  //       setCards(
-  //         data.map((card) => ({
-  //           _id: card._id,
-  //           name: card.name,
-  //           link: card.link,
-  //           likes: card.likes,
-  //           owner: card.owner,
-  //         }))
-  //       );
-  //     })
-  //     .catch((error) => console.log(`Ошибка: ${error}`));
-  // }, []);
+    api
+      .getInitialCards()
+      .then((data) => {
+        setCards(
+          data.map((card) => ({
+            _id: card._id,
+            name: card.name,
+            link: card.link,
+            likes: card.likes,
+            owner: card.owner,
+          }))
+        );
+      })
+      .catch((error) => console.log(`Ошибка: ${error}`));
+  }, []);
 
   function closeAllPopups() {
     setIsEditProfilePopupOpen(false);
