@@ -1,13 +1,9 @@
-// import React from "react";
 import React, { useState, useEffect, useCallback } from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 
-// import Header from "./Header";
 import Main from "./Main";
 import Footer from "./Footer";
-
 import CurrentUserContext from "../contexts/CurrentUserContext";
-
 import EditProfilePopup from "./EditProfilePopup";
 import EditAvatarPopup from "./EditAvatarPopup";
 import AddPlacePopup from "./AddPlacePopup";
@@ -53,6 +49,7 @@ function App() {
     }
   }, [loggedIn, navigate]);
 
+  //данные карточек и регистрации
   useEffect(() => {
     tokenCheck();
     if (loggedIn) {
@@ -111,14 +108,12 @@ function App() {
     navigate("/sign-in", { replace: true });
   }
 
-  
-
   function closeAllPopups() {
     setIsEditProfilePopupOpen(false);
     setIsAddPlacePopupOpen(false);
     setIsEditAvatarPopupOpen(false);
     setIsPopupDeleteCardOpen(false);
-    setIsInfoTooltipOpen(false)
+    setIsInfoTooltipOpen(false);
     setDeletedCard({});
     setSelectedCard({});
   }
