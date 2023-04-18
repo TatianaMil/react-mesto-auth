@@ -51,6 +51,7 @@ function App() {
 
   //данные карточек и регистрации
   useEffect(() => {
+    setIsLoading(true)
     tokenCheck();
     if (loggedIn) {
       Promise.all([api.getRealUserInfo(), api.getInitialCards()])
