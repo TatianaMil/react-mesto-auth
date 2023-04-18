@@ -11,7 +11,7 @@ function InfoTooltip(props) {
     >
       <div className="popup__container popup__container-open">
         <button
-          className="popup__button-closed"
+          className="popup__button-close"
           type="reset"
           onClick={props.onClose}
         />

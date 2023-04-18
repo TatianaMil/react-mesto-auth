@@ -139,6 +139,7 @@ function App() {
     setIsAddPlacePopupOpen(false);
     setIsEditAvatarPopupOpen(false);
     setIsPopupDeleteCardOpen(false);
+    setIsInfoTooltipOpen(false)
     setDeletedCard({});
     setSelectedCard({});
   }

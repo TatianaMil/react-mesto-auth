@@ -1,5 +1,5 @@
 .popup__img {
   max-width: 75vw;
   max-height: 75vh;
-  background-repeat: 20px;
+  border-radius: 10px;
 }
