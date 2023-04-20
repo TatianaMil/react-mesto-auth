@@ -45,4 +45,4 @@ Create React App;
 ## Ссылки:
 
 - [Макет в Figma](https://www.figma.com/file/5H3gsn5lIGPwzBPby9jAOo/JavaScript.-Sprint-12?node-id=0-1&t=9DgyqPh2L4Dj0Xfn-0)
-- [Проект mesto-react-auth](https://tatianamil.github.io/mesto-react-auth/)
+- [Проект mesto-react-auth](https://tatianamil.github.io/react-mesto-auth/)
